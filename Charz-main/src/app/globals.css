@@ -1,0 +1,61 @@
+@import "tailwindcss";
+
+:root {
+  /* Daha derin, hafif maviye çalan bir siyah zemin yerine "Slate" tabanlı modern bir dark mode temeli (veya tam tersi clean light) */
+  --background: #ffffff;
+  --foreground: #020617; /* Slate-900 */
+  --primary: #a3e635; /* Lime-500 - Enerji Rengi */
+  --primary-glow: rgba(132, 204, 22, 0.5);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-manrope);
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans), sans-serif;
+  overflow-x: hidden;
+}
+
+/* --- Premium Scrollbar --- */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background-color: #cbd5e1;
+  border-radius: 20px;
+  border: 3px solid transparent;
+  background-clip: content-box;
+}
+::-webkit-scrollbar-thumb:hover {
+  background-color: #94a3b8;
+}
+
+/* --- Selection Color (Markalaşma Detayı) --- */
+::selection {
+  background-color: var(--primary);
+  color: black;
+}
+
+/* --- Utility Animations --- */
+@keyframes shine {
+  0% { background-position: 200% center; }
+  100% { background-position: -200% center; }
+}
+
+.animate-shine {
+  animation: shine 8s linear infinite;
+}

@@ -1,0 +1,38 @@
+// Prisma 7 Standart Şeması
+generator client {
+  provider   = "prisma-client-js"
+  engineType = "library"
+}
+
+datasource db {
+  provider = "sqlite"
+  // DİKKAT: url satırı burada olmayacak!
+}
+
+// Araç Modeli
+model Vehicle {
+  id        Int      @id @default(autoincrement())
+  model     String
+  plate     String   @unique
+  battery   Int      @default(0)
+  status    String   @default("Beklemede")
+  updatedAt DateTime @updatedAt
+}
+
+// İstasyon Modeli
+model Station {
+  id           Int      @id @default(autoincrement())
+  name         String
+  location     String
+  status       String   @default("Aktif")
+  usedSockets  Int      @default(0)
+  totalSockets Int      @default(2)
+}
+
+// Dashboard İstatistikleri
+model DashboardStats {
+  id           Int      @id @default(1)
+  totalKwh     Float    @default(0.0)
+  dailyEarning Float    @default(0.0)
+  faultyUnits  Int      @default(0)
+}

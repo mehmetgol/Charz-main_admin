@@ -1,0 +1,5 @@
+# Project exclude paths
+/dashboard-backend/server.d.ts
+/dashboard-backend/server.d.ts.map
+/dashboard-backend/server.js
+/dashboard-backend/server.js.map

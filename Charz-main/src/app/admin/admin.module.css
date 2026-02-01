@@ -1,0 +1,79 @@
+.header {
+    background-color: green;
+    color: white;
+    padding: 40px 20px;
+    text-align: center;
+    font-weight: bold;
+    margin-bottom: 30px;
+}
+
+.mainContent {
+    display: flex;           /* Yan yana dizilimi sağlar */
+    align-items: center;     /* Dikeyde hizalar */
+    justify-content: center; /* Yatayda ortalar */
+    gap: 40px;               /* Resim ve form arası boşluk */
+    padding: 0 50px;
+    flex-wrap: wrap;         /* Küçük ekranlarda alt alta geçer */
+}
+
+.toggImage {
+    width: 45vw;             /* Sayfa genişliğinin yarısı */
+    height: auto;
+    border: 5px solid green;
+    border-radius: 20px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+
+.registerBox {
+    flex: 1;
+    max-width: 400px;        /* Formun çok genişlemesini engeller */
+    padding: 30px;
+    background: #ffffff;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.registerBox h2 {
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.inputGroup {
+    margin-bottom: 20px;
+}
+
+.inputGroup label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #555;
+}
+
+.inputGroup input {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    outline: none;
+    transition: border-color 0.3s;
+}
+
+.inputGroup input:focus {
+    border-color: green;     /* Tıkladığında yeşil olur */
+}
+
+.submitBtn {
+    width: 100%;
+    padding: 12px;
+    background-color: green;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.submitBtn:hover {
+    background-color: darkgreen;
+}

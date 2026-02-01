@@ -1,0 +1,62 @@
+.container {
+    padding: 32px;
+}
+
+.title {
+    margin-bottom: 24px;
+    font-size: 1.8rem;
+    font-weight: 700;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 24px;
+}
+
+.stationCard {
+    background: white;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    border-top: 6px solid #e2e8f0;
+}
+
+.active { border-top-color: #22c55e; }
+.busy { border-top-color: #3b82f6; }
+.maintenance { border-top-color: #f59e0b; }
+
+.stationHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 16px;
+}
+
+.stationName {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #1e293b;
+}
+
+.socketInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-size: 0.9rem;
+    color: #64748b;
+}
+
+.progressContainer {
+    width: 100%;
+    background: #f1f5f9;
+    height: 8px;
+    border-radius: 4px;
+    margin-top: 12px;
+}
+
+.progressBar {
+    height: 100%;
+    background: #22c55e;
+    border-radius: 4px;
+}
