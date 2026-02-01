@@ -15,7 +15,7 @@ export default function SettingsPage() {
     return (
         <div className={styles.container}>
             <Link href="/dashboard" style={{ color: '#22c55e', textDecoration: 'none', fontWeight: 'bold' }}>
-                ← Dashboard'a Dön
+                ← Dashboard&apos;a Dön
             </Link>
 
             <header style={{ marginTop: '20px' }}>
