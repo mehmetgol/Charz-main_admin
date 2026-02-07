@@ -1,62 +1,30 @@
-.container {
-    padding: 32px;
-}
+.container { display: flex; min-height: 100vh; background: #0f172a; color: white; }
+.sidebar { width: 260px; background: #020617; padding: 24px; border-right: 1px solid #1e293b; }
+.main { flex: 1; padding: 32px; }
+.header h1 { color: #22c55e; margin-bottom: 24px; }
 
-.title {
-    margin-bottom: 24px;
-    font-size: 1.8rem;
-    font-weight: 700;
-}
+.formCard { background: #1e293b; padding: 20px; border-radius: 12px; margin-bottom: 30px; }
+.addForm { display: flex; gap: 10px; flex-wrap: wrap; }
+.addForm input, .addForm select { background: #0f172a; border: 1px solid #334155; color: white; padding: 10px; border-radius: 6px; flex: 1; }
+.addForm button { background: #22c55e; color: #020617; border: none; padding: 10px 20px; border-radius: 6px; font-weight: bold; cursor: pointer; }
 
-.grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 24px;
-}
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+.card { background: #1e293b; padding: 20px; border-radius: 15px; border-bottom: 4px solid #334155; transition: 0.3s; }
+.card:hover { transform: translateY(-5px); border-bottom-color: #22c55e; }
 
-.stationCard {
-    background: white;
-    border-radius: 16px;
-    padding: 24px;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-    border-top: 6px solid #e2e8f0;
-}
+.cardHeader { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.deleteBtn { background: none; border: none; cursor: pointer; font-size: 1.2rem; }
 
-.active { border-top-color: #22c55e; }
-.busy { border-top-color: #3b82f6; }
-.maintenance { border-top-color: #f59e0b; }
+.statusBox { margin: 15px 0; display: flex; align-items: center; gap: 10px; }
+.statusBox select { background: #0f172a; color: white; border: 1px solid #334155; padding: 5px; border-radius: 4px; }
 
-.stationHeader {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 16px;
-}
+/* Durum Renkleri */
+.statusAktif { color: #22c55e; }
+.statusArızalı { color: #ef4444; }
+.statusBakımda { color: #f59e0b; }
 
-.stationName {
-    font-size: 1.2rem;
-    font-weight: 700;
-    color: #1e293b;
-}
+.progressBar { width: 100%; height: 8px; background: #334155; border-radius: 4px; margin-top: 10px; overflow: hidden; }
+.progressFill { height: 100%; background: #22c55e; transition: 0.4s; }
 
-.socketInfo {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    font-size: 0.9rem;
-    color: #64748b;
-}
-
-.progressContainer {
-    width: 100%;
-    background: #f1f5f9;
-    height: 8px;
-    border-radius: 4px;
-    margin-top: 12px;
-}
-
-.progressBar {
-    height: 100%;
-    background: #22c55e;
-    border-radius: 4px;
-}
+.navItem { padding: 12px; color: #94a3b8; cursor: pointer; display: block; text-decoration: none; border-radius: 8px; }
+.active { background: #1e293b; color: #22c55e; font-weight: bold; }

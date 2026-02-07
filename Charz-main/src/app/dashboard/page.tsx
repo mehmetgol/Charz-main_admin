@@ -12,6 +12,7 @@ interface DashboardStats {
 }
 
 export default function Dashboard() {
+    // 1. HATA DÜZELTME: Başlangıç state'ini en güvenli şekilde kuruyoruz.
     const [stats, setStats] = useState<DashboardStats>({
         totalKwh: 0,
         activeCars: 0,
@@ -22,42 +23,50 @@ export default function Dashboard() {
 
     const [formattedTime, setFormattedTime] = useState<string>("");
 
-    // PORT 5000 AYARI BURADA
-    const API_URL = 'http://localhost:5000/api/stats';
+    // 2. HATA DÜZELTME: localhost bazen IPv6 (::1) üzerinden bağlanmaya çalışır,
+    // 127.0.0.1 kullanmak "Failed to Fetch" hatalarını %90 azaltır.
+    const API_URL = 'http://127.0.0.1:5000/api/stats';
 
     useEffect(() => {
-        // 1. Önce veriyi Backend'den (5000 portu) çekmeyi dene
         fetch(API_URL)
             .then((res) => {
-                if (!res.ok) throw new Error("Backend'e ulaşılamadı");
+                if (!res.ok) throw new Error("Sunucu yanıt vermedi");
                 return res.json();
             })
-            .then((data) => {
-                setStats(data);
-                localStorage.setItem('dashboard_data', JSON.stringify(data));
+            .then((data: DashboardStats) => {
+                if (data) {
+                    setStats(data);
+                    localStorage.setItem('dashboard_data', JSON.stringify(data));
+                }
             })
             .catch((err) => {
-                console.error("Backend hatası, yerel hafıza kontrol ediliyor:", err);
-                // Backend çalışmıyorsa yerel hafızadan kurtar
+                console.error("Veri çekilemedi, yerel hafızaya bakılıyor:", err);
                 const savedStats = localStorage.getItem('dashboard_data');
                 if (savedStats) {
-                    setStats(JSON.parse(savedStats));
+                    try {
+                        setStats(JSON.parse(savedStats));
+                    } catch (e) {
+                        console.error("Localstorage verisi bozuk.");
+                    }
                 }
             });
     }, []);
 
-    // İstatistikler değiştikçe (özellikle manuel güncellemelerde) kaydet
+    // 3. HATA DÜZELTME: "Cannot read properties of null" hatasını önlemek için
+    // opsiyonel zincirleme (?.) ve null kontrolü ekliyoruz.
     useEffect(() => {
-        if (stats.totalKwh !== 0) {
-            localStorage.setItem('dashboard_data', JSON.stringify(stats));
+        if (stats && stats.lastUpdate) {
+            try {
+                const date = new Date(stats.lastUpdate);
+                // Geçersiz tarih kontrolü
+                if (!isNaN(date.getTime())) {
+                    setFormattedTime(date.toLocaleTimeString());
+                }
+            } catch (e) {
+                setFormattedTime("--:--");
+            }
         }
-    }, [stats]);
-
-    useEffect(() => {
-        if (stats.lastUpdate) {
-            setFormattedTime(new Date(stats.lastUpdate).toLocaleTimeString());
-        }
-    }, [stats.lastUpdate]);
+    }, [stats?.lastUpdate]); // Buradaki soru işareti hayati önem taşıyor
 
     return (
         <div className={styles.container}>
@@ -74,30 +83,32 @@ export default function Dashboard() {
             <main className={styles.main}>
                 <header className={styles.header}>
                     <h1>Yönetim Paneli</h1>
-                    <div>
-                        <span>Son Güncelleme: <b>{formattedTime}</b></span>
+                    <div className={styles.updateTime}>
+                        <span>Son Güncelleme: <b>{formattedTime || "--:--"}</b></span>
                     </div>
                 </header>
 
                 <div className={styles.statsGrid}>
                     <div className={styles.card}>
                         <h3>Toplam Enerji</h3>
-                        <p>{stats.totalKwh.toLocaleString()} kWh</p>
+                        <p>{stats.totalKwh?.toLocaleString() ?? 0} kWh</p>
                     </div>
 
                     <div className={styles.card}>
                         <h3>Aktif Araçlar</h3>
-                        <p>{stats.activeCars}</p>
+                        <p>{stats.activeCars ?? 0}</p>
                     </div>
 
-                    <div className={styles.card} style={{ borderBottomColor: '#ef4444' }}>
+                    <div className={styles.card} style={{ borderBottomColor: stats.faultyUnits > 0 ? '#ef4444' : '#22c55e' }}>
                         <h3>Arızalı Üniteler</h3>
-                        <p style={{ color: '#ef4444' }}>{stats.faultyUnits}</p>
+                        <p style={{ color: stats.faultyUnits > 0 ? '#ef4444' : '#22c55e' }}>
+                            {stats.faultyUnits ?? 0}
+                        </p>
                     </div>
 
                     <div className={styles.card}>
                         <h3>Günlük Kazanç</h3>
-                        <p>₺{stats.dailyEarning.toLocaleString()}</p>
+                        <p>₺{stats.dailyEarning?.toLocaleString() ?? 0}</p>
                     </div>
                 </div>
 

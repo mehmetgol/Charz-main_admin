@@ -1,88 +1,136 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import styles from './stations.module.css';
 import Link from 'next/link';
 
-// Durumları ve onlara karşılık gelen CSS class'larını eşleştirelim
-const STATUS_STYLES: Record<string, string> = {
-    "Aktif": styles.active,
-    "Dolu": styles.busy,
-    "Bakımda": styles.maintenance
-};
-
-const initialStations = [
-    { id: 1, name: "Togg Trugo - Zorlu Center", location: "İstanbul", status: "Aktif", used: 2, total: 4 },
-    { id: 2, name: "Togg Trugo - Panora AVM", location: "Ankara", status: "Dolu", used: 8, total: 8 },
-    { id: 3, name: "Togg Trugo - İzmir Otoban", location: "İzmir", status: "Bakımda", used: 0, total: 2 },
-    { id: 4, name: "Togg Trugo - Bursa Fabrika", location: "Bursa", status: "Aktif", used: 1, total: 6 },
-];
+interface Station {
+    id: number;
+    name: string;
+    location: string;
+    status: string;
+    usedSockets: number;
+    totalSockets: number;
+}
 
 export default function StationsPage() {
-    const [stations, setStations] = useState(initialStations);
+    const [stations, setStations] = useState<Station[]>([]);
+    const [newStation, setNewStation] = useState({ name: '', location: '', totalSockets: 2, status: 'Aktif' });
 
-    // Durumu değiştiren fonksiyon
-    const toggleStatus = (id: number) => {
-        setStations(prev => prev.map(s => {
-            if (s.id === id) {
-                const nextStatus = s.status === "Aktif" ? "Dolu" : s.status === "Dolu" ? "Bakımda" : "Aktif";
-                return { ...s, status: nextStatus };
+    // Windows localhost sorunlarını önlemek için 127.0.0.1 kullanımı
+    const API_URL = 'http://127.0.0.1:5000/api/stations';
+
+    const fetchStations = async () => {
+        try {
+            const res = await fetch(API_URL);
+            if (res.ok) {
+                const data = await res.json();
+                setStations(data);
             }
-            return s;
-        }));
+        } catch (err) {
+            console.error("Veri çekilemedi:", err);
+        }
+    };
+
+    useEffect(() => { fetchStations(); }, []);
+
+    // EKLEME VE GÜNCELLEME DÜZELTİLDİ
+    const handleSave = async (stationData: any) => {
+        try {
+            const res = await fetch(`${API_URL}/update`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                // id: 0 ise yeni kayıt, id > 0 ise güncelleme
+                body: JSON.stringify({
+                    ...stationData,
+                    totalSockets: Number(stationData.totalSockets),
+                    usedSockets: Number(stationData.usedSockets || 0)
+                })
+            });
+
+            if (res.ok) {
+                setNewStation({ name: '', location: '', totalSockets: 2, status: 'Aktif' });
+                await fetchStations();
+            } else {
+                const errorData = await res.json();
+                alert("Hata: " + errorData.error);
+            }
+        } catch (err) {
+            alert("Sunucuya ulaşılamadı!");
+        }
+    };
+
+    // SİLME DÜZELTİLDİ
+    const handleDelete = async (id: number) => {
+        if (!window.confirm("Bu istasyonu silmek istediğinize emin misiniz?")) return;
+
+        try {
+            const res = await fetch(`${API_URL}/${id}`, {
+                method: 'DELETE',
+            });
+
+            if (res.ok) {
+                console.log(`ID ${id} başarıyla silindi`);
+                await fetchStations();
+            } else {
+                alert("Silme işlemi başarısız!");
+            }
+        } catch (err) {
+            alert("Bağlantı hatası!");
+        }
     };
 
     return (
         <div className={styles.container}>
-            <Link href="/dashboard" style={{color: '#22c55e', textDecoration: 'none', fontWeight: 'bold', display: 'block', marginBottom: '15px'}}>
-                ← Dashboard&apos;a Dön
-            </Link>
+            <aside className={styles.sidebar}>
+                <h2>TOGG CHARZ</h2>
+                <nav className={styles.navMenu}>
+                    <Link href="/dashboard" className={styles.navItem}>📊 Genel Bakış</Link>
+                    <Link href="/dashboard/vehicles" className={styles.navItem}>🚗 Araç Listesi</Link>
+                    <Link href="/dashboard/stations" className={`${styles.navItem} ${styles.active}`}>🔌 İstasyonlar</Link>
+                </nav>
+            </aside>
 
-            <h1 className={styles.title}>Şarj İstasyonları Durumu</h1>
-            <p style={{color: '#94a3b8', marginBottom: '20px', fontSize: '0.9rem'}}>* Durumu değiştirmek için kartların üzerine tıklayabilirsiniz.</p>
+            <main className={styles.main}>
+                <header className={styles.header}>
+                    <h1>İstasyon Yönetimi</h1>
+                </header>
 
-            <div className={styles.grid}>
-                {stations.map((s) => (
-                    <div
-                        key={s.id}
-                        className={`${styles.stationCard} ${STATUS_STYLES[s.status]}`}
-                        onClick={() => toggleStatus(s.id)} // Tıklanınca durum değişir
-                        style={{ cursor: 'pointer', transition: 'transform 0.2s' }}
-                    >
-                        <div className={styles.stationHeader}>
-                            <div>
-                                <div className={styles.stationName}>{s.name}</div>
-                                <div style={{fontSize: '0.8rem', color: '#94a3b8'}}>{s.location}</div>
+                {/* EKLEME FORMU */}
+                <section className={styles.formCard}>
+                    <form onSubmit={(e) => { e.preventDefault(); handleSave({ ...newStation, id: 0 }); }} className={styles.addForm}>
+                        <input placeholder="İstasyon Adı" value={newStation.name} onChange={e => setNewStation({...newStation, name: e.target.value})} required />
+                        <input placeholder="Konum" value={newStation.location} onChange={e => setNewStation({...newStation, location: e.target.value})} required />
+                        <input type="number" placeholder="Soket Sayısı" value={newStation.totalSockets} onChange={e => setNewStation({...newStation, totalSockets: Number(e.target.value)})} required />
+                        <button type="submit">➕ Ekle</button>
+                    </form>
+                </section>
+
+                <div className={styles.grid}>
+                    {stations.map((s) => (
+                        <div key={s.id} className={styles.card}>
+                            <div className={styles.cardHeader}>
+                                <h3>{s.name}</h3>
+                                {/* onClick fonksiyonu düzeltildi */}
+                                <button className={styles.deleteBtn} onClick={() => handleDelete(s.id)}>🗑️</button>
                             </div>
-                            <span style={{
-                                fontSize: '0.75rem',
-                                fontWeight: 'bold',
-                                background: '#f1f5f9',
-                                padding: '4px 8px',
-                                borderRadius: '4px',
-                                color: s.status === 'Dolu' ? '#3b82f6' : s.status === 'Bakımda' ? '#ef4444' : '#22c55e'
-                            }}>
-                                {s.status}
-                            </span>
-                        </div>
+                            <p>📍 {s.location}</p>
 
-                        <div className={styles.socketInfo}>
-                            <span>Soket Kullanımı: <b>{s.used} / {s.total}</b></span>
-                            <div className={styles.progressContainer}>
-                                <div
-                                    className={styles.progressBar}
-                                    style={{
-                                        width: `${(s.used / s.total) * 100}%`,
-                                        backgroundColor: s.status === 'Dolu' ? '#3b82f6' : s.status === 'Bakımda' ? '#ef4444' : '#22c55e'
-                                    }}
-                                ></div>
+                            <div className={styles.statusBox}>
+                                <span>Durum:</span>
+                                <select
+                                    value={s.status}
+                                    onChange={(e) => handleSave({ ...s, status: e.target.value })}
+                                    className={styles[`status${s.status}`]}
+                                >
+                                    <option value="Aktif">Aktif</option>
+                                    <option value="Arızalı">Arızalı</option>
+                                    <option value="Bakımda">Bakımda</option>
+                                </select>
                             </div>
                         </div>
-                        <div style={{marginTop: '10px', fontSize: '0.7rem', textAlign: 'right', opacity: 0.6}}>
-                            Durumu Değiştirmek İçin Tıkla
-                        </div>
-                    </div>
-                ))}
-            </div>
+                    ))}
+                </div>
+            </main>
         </div>
     );
 }

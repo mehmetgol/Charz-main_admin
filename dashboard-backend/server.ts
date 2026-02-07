@@ -5,27 +5,25 @@ import { PrismaClient } from '@prisma/client';
 const app = express();
 const prisma = new PrismaClient();
 
-// ÖNEMLİ: Frontend (Next.js) bağlantısı için CORS şart
+// Middleware Ayarları
 app.use(cors());
 app.use(express.json());
 
 // ==========================================
-// 1. DASHBOARD İSTATİSTİKLERİ (GET & POST)
+// 1. DASHBOARD İSTATİSTİKLERİ
 // ==========================================
 
 // İstatistikleri Getir
 app.get('/api/stats', async (req: Request, res: Response) => {
     try {
-        const stats = await prisma.dashboardStats.findUnique({
-            where: { id: 1 }
-        });
+        const stats = await prisma.dashboardStats.findUnique({ where: { id: 1 } });
         res.json(stats);
     } catch (error) {
         res.status(500).json({ error: "İstatistikler çekilemedi" });
     }
 });
 
-// İstatistikleri Güncelle
+// İstatistikleri Güncelle (Admin Paneli İçin)
 app.post('/api/stats', async (req: Request, res: Response) => {
     try {
         const { totalKwh, dailyEarning, faultyUnits } = req.body;
@@ -39,91 +37,121 @@ app.post('/api/stats', async (req: Request, res: Response) => {
         });
         res.json(updated);
     } catch (error) {
-        res.status(500).json({ error: "Veritabanı güncellenemedi (ID:1 kayıtlı olmayabilir)" });
+        res.status(500).json({ error: "Güncelleme başarısız" });
     }
 });
 
 // ==========================================
-// 2. ARAÇ YÖNETİMİ (GET, UPSERT & DELETE)
+// 2. ARAÇ YÖNETİMİ (Vehicles)
 // ==========================================
 
-// Tüm Araçları Getir (URL: /api/vehicles)
 app.get('/api/vehicles', async (req: Request, res: Response) => {
     try {
-        const vehicles = await prisma.vehicle.findMany({
-            orderBy: { id: 'desc' }
-        });
+        const vehicles = await prisma.vehicle.findMany({ orderBy: { id: 'desc' } });
         res.json(vehicles);
     } catch (error) {
-        res.status(500).json({ error: "Araç listesi çekilemedi" });
+        res.status(500).json({ error: "Araçlar listelenemedi" });
     }
 });
 
-// Araç Ekle veya Güncelle
 app.post('/api/vehicles/update', async (req: Request, res: Response) => {
     try {
         const { id, model, plate, status, battery } = req.body;
-
         const result = await prisma.vehicle.upsert({
             where: { id: Number(id) || 0 },
-            update: {
-                model,
-                plate,
-                status,
-                battery: Number(battery)
-            },
-            create: {
-                model,
-                plate,
-                status,
-                battery: Number(battery) || 0
-            }
+            update: { model, plate, status, battery: Number(battery) },
+            create: { model, plate, status, battery: Number(battery) || 0 }
         });
         res.json(result);
     } catch (error) {
-        console.error("Hata:", error);
-        res.status(500).json({ error: "Araç kaydedilemedi. Plaka zaten mevcut olabilir." });
+        res.status(500).json({ error: "Araç kaydedilemedi" });
     }
 });
 
-// Araç Sil
 app.delete('/api/vehicles/:id', async (req: Request, res: Response) => {
     try {
-        const { id } = req.params;
-        await prisma.vehicle.delete({
-            where: { id: Number(id) }
-        });
+        await prisma.vehicle.delete({ where: { id: Number(req.params.id) } });
         res.json({ message: "Araç silindi" });
     } catch (error) {
-        res.status(500).json({ error: "Silme işlemi başarısız" });
+        res.status(500).json({ error: "Silme başarısız" });
     }
 });
 
 // ==========================================
-// 3. İSTASYONLAR (GET)
+// 3. İSTASYON YÖNETİMİ (Stations) - BUTONLARI ÇALIŞTIRAN KISIM
 // ==========================================
 
+// İstasyonları Listele
 app.get('/api/stations', async (req: Request, res: Response) => {
     try {
-        const stations = await prisma.station.findMany();
+        const stations = await prisma.station.findMany({ orderBy: { id: 'desc' } });
         res.json(stations);
     } catch (error) {
-        res.status(500).json({ error: "İstasyon verisi çekilemedi" });
+        res.status(500).json({ error: "İstasyonlar çekilemedi" });
     }
 });
 
-// ==========================================
-// SUNUCU BAŞLATMA
-// ==========================================
+// İstasyon Ekle veya Güncelle (Upsert)
+app.post('/api/stations/update', async (req: Request, res: Response) => {
+    try {
+        const { id, name, location, status, totalSockets, usedSockets } = req.body;
 
+        // Gelen verileri sayıya çevirerek Prisma hatalarını önle
+        const stationId = Number(id) || 0;
+
+        const result = await prisma.station.upsert({
+            where: { id: stationId },
+            update: {
+                name: String(name),
+                location: String(location),
+                status: String(status),
+                totalSockets: Number(totalSockets),
+                usedSockets: Number(usedSockets || 0)
+            },
+            create: {
+                name: String(name),
+                location: String(location),
+                status: String(status || "Aktif"),
+                totalSockets: Number(totalSockets) || 2,
+                usedSockets: Number(usedSockets || 0)
+            }
+        });
+
+        console.log(`✅ İstasyon İşlemi Başarılı: ${result.name} (ID: ${result.id})`);
+        res.json(result);
+    } catch (error: any) {
+        console.error("❌ İstasyon Kayıt Hatası:", error.message);
+        res.status(500).json({ error: "İstasyon veritabanına işlenemedi" });
+    }
+});
+
+// İstasyon Sil
+app.delete('/api/stations/:id', async (req: Request, res: Response) => {
+    try {
+        const stationId = Number(req.params.id);
+
+        if (!stationId) return res.status(400).json({ error: "Geçersiz ID" });
+
+        await prisma.station.delete({ where: { id: stationId } });
+
+        console.log(`🗑️ İstasyon Silindi: ID ${stationId}`);
+        res.json({ message: "Başarıyla silindi" });
+    } catch (error: any) {
+        console.error("❌ Silme Hatası:", error.message);
+        res.status(500).json({ error: "Silme işlemi veritabanında başarısız oldu" });
+    }
+});
+
+// Sunucuyu Başlat
 const PORT = 5000;
 app.listen(PORT, () => {
     console.log(`
-🚀 BACKEND SUNUCUSU ÇALIŞIYOR!
+🚀 CHARZ BACKEND AKTİF!
 ---------------------------------------
 📡 Port: ${PORT}
-🔗 Araçlar API: http://localhost:${PORT}/api/vehicles
-📊 İstatistik API: http://localhost:${PORT}/api/stats
+🔗 İstatistikler: http://localhost:${PORT}/api/stats
+🔌 İstasyonlar: http://localhost:${PORT}/api/stations
+🚗 Araçlar: http://localhost:${PORT}/api/vehicles
 ---------------------------------------
     `);
 });
