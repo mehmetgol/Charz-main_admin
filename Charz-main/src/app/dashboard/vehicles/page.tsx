@@ -1,59 +1,110 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import styles from './vehicles.module.css';
 import Link from 'next/link';
 
-// İlk verilerimizi bir state içine alıyoruz
-const initialVehicles = [
-    { id: 1, model: "Togg T10X", plate: "34 TOGG 2026", battery: "%85", status: "Şarj Oluyor", class: styles.charging },
-    { id: 2, model: "Togg T10X", plate: "06 TGG 06", battery: "%40", status: "Beklemede", class: styles.idle },
-    { id: 3, model: "Togg T10S", plate: "35 ABC 123", battery: "%12", status: "Bağlantı Yok", class: styles.offline },
-];
+interface Vehicle {
+    id: number;
+    model: string;
+    plate: string;
+    battery: number;
+    status: string;
+}
 
 export default function VehiclesPage() {
-    const [vehicles, setVehicles] = useState(initialVehicles);
+    const [vehicles, setVehicles] = useState<Vehicle[]>([]);
     const [newVehicle, setNewVehicle] = useState({ model: '', plate: '', status: 'Beklemede' });
+    const [loading, setLoading] = useState(true);
 
-    // Yeni araç ekleme fonksiyonu
-    const addVehicle = (e: React.FormEvent) => {
+    const API_URL = 'http://localhost:5000/api/vehicles';
+
+    // 1. VERİLERİ ÇEK
+    const fetchVehicles = async () => {
+        try {
+            const res = await fetch(API_URL);
+            const data = await res.json();
+            setVehicles(data);
+        } catch (err) {
+            console.error("Veri çekme hatası:", err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchVehicles();
+    }, []);
+
+    // 2. YENİ ARAÇ EKLE
+    const addVehicle = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!newVehicle.model || !newVehicle.plate) return alert("Lütfen boş alanları doldurun!");
+        if (!newVehicle.model || !newVehicle.plate) return alert("Lütfen alanları doldurun!");
 
-        const vehicleToAdd = {
-            id: Date.now(), // Geçici benzersiz ID
+        const vehicleData = {
+            id: 0, // Yeni kayıt için 0 gönderiyoruz (Backend upsert bunu yeni kayıt olarak görecek)
             model: newVehicle.model,
             plate: newVehicle.plate,
-            battery: "%0", // Yeni eklenen araç %0 ile başlasın
             status: newVehicle.status,
-            class: newVehicle.status === "Şarj Oluyor" ? styles.charging : styles.idle
+            battery: 0
         };
 
-        setVehicles([...vehicles, vehicleToAdd]);
-        setNewVehicle({ model: '', plate: '', status: 'Beklemede' }); // Formu sıfırla
+        try {
+            const response = await fetch(`${API_URL}/update`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(vehicleData),
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                alert("Araç başarıyla kaydedildi!");
+                setNewVehicle({ model: '', plate: '', status: 'Beklemede' });
+                fetchVehicles(); // Listeyi güncelle
+            } else {
+                alert("Hata: " + (result.error || "Bilinmeyen bir sorun oluştu"));
+            }
+        } catch (err) {
+            console.error("Bağlantı hatası:", err);
+            alert("Backend sunucusuna ulaşılamadı. Sunucunun 5000 portunda açık olduğundan emin olun!");
+        }
+    };
+
+    // 3. ARAÇ SİL
+    const deleteVehicle = async (id: number) => {
+        if (!confirm("Bu aracı silmek istediğinize emin misiniz?")) return;
+
+        try {
+            const response = await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
+            if (response.ok) {
+                fetchVehicles();
+            }
+        } catch (err) {
+            console.error("Silme hatası:", err);
+        }
     };
 
     return (
         <div className={styles.container}>
-            <Link href="/dashboard" style={{color: '#22c55e', textDecoration: 'none', fontWeight: 'bold', display: 'block', marginBottom: '20px'}}>
+            <Link href="/dashboard" style={{color: '#22c55e', marginBottom: '20px', display: 'block'}}>
                 ← Dashboard'a Dön
             </Link>
 
             <h1 className={styles.title}>Araç Yönetimi</h1>
 
-            {/* Yeni Araç Ekleme Formu */}
             <div className={styles.addForm}>
                 <h3>Yeni Araç Kaydı</h3>
                 <form onSubmit={addVehicle} className={styles.formInline}>
                     <input
                         type="text"
-                        placeholder="Model (Örn: Togg T10X)"
+                        placeholder="Model"
                         value={newVehicle.model}
                         onChange={(e) => setNewVehicle({...newVehicle, model: e.target.value})}
                         className={styles.input}
                     />
                     <input
                         type="text"
-                        placeholder="Plaka (Örn: 34 ABC 123)"
+                        placeholder="Plaka"
                         value={newVehicle.plate}
                         onChange={(e) => setNewVehicle({...newVehicle, plate: e.target.value})}
                         className={styles.input}
@@ -66,44 +117,37 @@ export default function VehiclesPage() {
                         <option value="Beklemede">Beklemede</option>
                         <option value="Şarj Oluyor">Şarj Oluyor</option>
                     </select>
-                    <button type="submit" className={styles.addButton}>Ekle</button>
+                    <button type="submit" className={styles.addButton}>Ekle ve Kaydet</button>
                 </form>
             </div>
 
             <div className={styles.tableWrapper}>
-                <table className={styles.vehicleTable}>
-                    <thead>
-                    <tr>
-                        <th>Model</th>
-                        <th>Plaka</th>
-                        <th>Batarya</th>
-                        <th>Durum</th>
-                        <th>İşlem</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {vehicles.map((v) => (
-                        <tr key={v.id}>
-                            <td><b>{v.model}</b></td>
-                            <td>{v.plate}</td>
-                            <td>{v.battery}</td>
-                            <td>
-                                <span className={`${styles.statusBadge} ${v.class}`}>
-                                    {v.status}
-                                </span>
-                            </td>
-                            <td>
-                                <button
-                                    onClick={() => setVehicles(vehicles.filter(item => item.id !== v.id))}
-                                    className={styles.deleteButton}
-                                >
-                                    Sil
-                                </button>
-                            </td>
+                {loading ? <p>Yükleniyor...</p> : (
+                    <table className={styles.vehicleTable}>
+                        <thead>
+                        <tr>
+                            <th>Model</th>
+                            <th>Plaka</th>
+                            <th>Batarya</th>
+                            <th>Durum</th>
+                            <th>İşlem</th>
                         </tr>
-                    ))}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                        {vehicles.map((v) => (
+                            <tr key={v.id}>
+                                <td><b>{v.model}</b></td>
+                                <td>{v.plate}</td>
+                                <td>%{v.battery}</td>
+                                <td>{v.status}</td>
+                                <td>
+                                    <button onClick={() => deleteVehicle(v.id)} className={styles.deleteButton}>Sil</button>
+                                </td>
+                            </tr>
+                        ))}
+                        </tbody>
+                    </table>
+                )}
             </div>
         </div>
     );

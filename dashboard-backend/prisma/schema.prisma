@@ -4,11 +4,11 @@ generator client {
   engineType = "library"
 }
 
+
 datasource db {
   provider = "sqlite"
-  // DİKKAT: url satırı burada olmayacak!
+  url      = "file:./dev.db"
 }
-
 // Araç Modeli
 model Vehicle {
   id        Int      @id @default(autoincrement())

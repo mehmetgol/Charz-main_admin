@@ -2,38 +2,52 @@ import express, { Request, Response } from 'express';
 import cors from 'cors';
 import { PrismaClient } from '@prisma/client';
 
-// 1. Prisma Client Yapılandırması
-// En güvenli yol: Hiçbir parametre vermemek. Prisma otomatik olarak .env dosyasını okur.
+const app = express();
 const prisma = new PrismaClient();
 
-const app = express();
-const PORT = Number(process.env.PORT) || 5000;
-
-// 2. Middleware Ayarları
+// ÖNEMLİ: Frontend (Next.js) bağlantısı için CORS şart
 app.use(cors());
 app.use(express.json());
 
-/** * 3. API Rotaları
- */
+// ==========================================
+// 1. DASHBOARD İSTATİSTİKLERİ (GET & POST)
+// ==========================================
 
-// Dashboard İstatistikleri
+// İstatistikleri Getir
 app.get('/api/stats', async (req: Request, res: Response) => {
     try {
-        const vehicleCount = await prisma.vehicle.count();
-        res.json({
-            totalKwh: 12450.5,
-            activeCars: vehicleCount,
-            faultyUnits: 3,
-            dailyEarning: 8200,
-            lastUpdate: new Date().toISOString()
+        const stats = await prisma.dashboardStats.findUnique({
+            where: { id: 1 }
         });
+        res.json(stats);
     } catch (error) {
-        console.error("Stats Error:", error);
-        res.status(500).json({ error: "İstatistikler alınamadı." });
+        res.status(500).json({ error: "İstatistikler çekilemedi" });
     }
 });
 
-// Araç Listesi
+// İstatistikleri Güncelle
+app.post('/api/stats', async (req: Request, res: Response) => {
+    try {
+        const { totalKwh, dailyEarning, faultyUnits } = req.body;
+        const updated = await prisma.dashboardStats.update({
+            where: { id: 1 },
+            data: {
+                totalKwh: Number(totalKwh),
+                dailyEarning: Number(dailyEarning),
+                faultyUnits: Number(faultyUnits)
+            },
+        });
+        res.json(updated);
+    } catch (error) {
+        res.status(500).json({ error: "Veritabanı güncellenemedi (ID:1 kayıtlı olmayabilir)" });
+    }
+});
+
+// ==========================================
+// 2. ARAÇ YÖNETİMİ (GET, UPSERT & DELETE)
+// ==========================================
+
+// Tüm Araçları Getir (URL: /api/vehicles)
 app.get('/api/vehicles', async (req: Request, res: Response) => {
     try {
         const vehicles = await prisma.vehicle.findMany({
@@ -41,61 +55,75 @@ app.get('/api/vehicles', async (req: Request, res: Response) => {
         });
         res.json(vehicles);
     } catch (error) {
-        res.status(500).json({ error: "Araç listesi alınamadı." });
+        res.status(500).json({ error: "Araç listesi çekilemedi" });
     }
 });
 
-// Yeni Araç Ekleme
-app.post('/api/vehicles', async (req: Request, res: Response) => {
-    const { model, plate, status } = req.body;
+// Araç Ekle veya Güncelle
+app.post('/api/vehicles/update', async (req: Request, res: Response) => {
     try {
-        const newVehicle = await prisma.vehicle.create({
-            data: {
+        const { id, model, plate, status, battery } = req.body;
+
+        const result = await prisma.vehicle.upsert({
+            where: { id: Number(id) || 0 },
+            update: {
                 model,
                 plate,
-                status: status || "Beklemede",
-                battery: 0
+                status,
+                battery: Number(battery)
+            },
+            create: {
+                model,
+                plate,
+                status,
+                battery: Number(battery) || 0
             }
         });
-        res.status(201).json(newVehicle);
+        res.json(result);
     } catch (error) {
-        console.error("Ekleme Hatası:", error);
-        res.status(500).json({ error: "Araç eklenemedi." });
+        console.error("Hata:", error);
+        res.status(500).json({ error: "Araç kaydedilemedi. Plaka zaten mevcut olabilir." });
     }
 });
 
-// Araç Durumu Güncelleme
-app.patch('/api/vehicles/:id', async (req: Request, res: Response) => {
-    const { id } = req.params;
-    const { status } = req.body;
-    try {
-        const updated = await prisma.vehicle.update({
-            where: { id: Number(id) },
-            data: { status }
-        });
-        res.json(updated);
-    } catch (error) {
-        res.status(500).json({ error: "Güncelleme başarısız." });
-    }
-});
-
-// Araç Silme
+// Araç Sil
 app.delete('/api/vehicles/:id', async (req: Request, res: Response) => {
-    const { id } = req.params;
     try {
-        await prisma.vehicle.delete({ where: { id: Number(id) } });
-        res.json({ message: "Başarıyla silindi." });
+        const { id } = req.params;
+        await prisma.vehicle.delete({
+            where: { id: Number(id) }
+        });
+        res.json({ message: "Araç silindi" });
     } catch (error) {
-        res.status(500).json({ error: "Silme başarısız." });
+        res.status(500).json({ error: "Silme işlemi başarısız" });
     }
 });
 
-// 4. Sunucuyu Başlatma
-app.listen(PORT, '0.0.0.0', () => {
+// ==========================================
+// 3. İSTASYONLAR (GET)
+// ==========================================
+
+app.get('/api/stations', async (req: Request, res: Response) => {
+    try {
+        const stations = await prisma.station.findMany();
+        res.json(stations);
+    } catch (error) {
+        res.status(500).json({ error: "İstasyon verisi çekilemedi" });
+    }
+});
+
+// ==========================================
+// SUNUCU BAŞLATMA
+// ==========================================
+
+const PORT = 5000;
+app.listen(PORT, () => {
     console.log(`
-    🚀 TOGG CHARZ BACKEND ÇALIŞIYOR!
-    ---------------------------
-    📍 Adres: http://localhost:${PORT}
-    ---------------------------
+🚀 BACKEND SUNUCUSU ÇALIŞIYOR!
+---------------------------------------
+📡 Port: ${PORT}
+🔗 Araçlar API: http://localhost:${PORT}/api/vehicles
+📊 İstatistik API: http://localhost:${PORT}/api/stats
+---------------------------------------
     `);
 });

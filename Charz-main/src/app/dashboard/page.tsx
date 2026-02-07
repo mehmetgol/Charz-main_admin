@@ -22,25 +22,42 @@ export default function Dashboard() {
 
     const [formattedTime, setFormattedTime] = useState<string>("");
 
+    // PORT 5000 AYARI BURADA
+    const API_URL = 'http://localhost:5000/api/stats';
+
+    useEffect(() => {
+        // 1. Önce veriyi Backend'den (5000 portu) çekmeyi dene
+        fetch(API_URL)
+            .then((res) => {
+                if (!res.ok) throw new Error("Backend'e ulaşılamadı");
+                return res.json();
+            })
+            .then((data) => {
+                setStats(data);
+                localStorage.setItem('dashboard_data', JSON.stringify(data));
+            })
+            .catch((err) => {
+                console.error("Backend hatası, yerel hafıza kontrol ediliyor:", err);
+                // Backend çalışmıyorsa yerel hafızadan kurtar
+                const savedStats = localStorage.getItem('dashboard_data');
+                if (savedStats) {
+                    setStats(JSON.parse(savedStats));
+                }
+            });
+    }, []);
+
+    // İstatistikler değiştikçe (özellikle manuel güncellemelerde) kaydet
+    useEffect(() => {
+        if (stats.totalKwh !== 0) {
+            localStorage.setItem('dashboard_data', JSON.stringify(stats));
+        }
+    }, [stats]);
+
     useEffect(() => {
         if (stats.lastUpdate) {
             setFormattedTime(new Date(stats.lastUpdate).toLocaleTimeString());
         }
     }, [stats.lastUpdate]);
-
-    useEffect(() => {
-        // API yolunu '/api/stats' yaparak kendi iç API'mize yönlendirdik
-        const API_URL = '/api/stats';
-
-        fetch(API_URL)
-            .then((res) => res.json())
-            .then((data) => {
-                setStats(data);
-            })
-            .catch((err) => {
-                console.error("Veri çekilemedi:", err);
-            });
-    }, []);
 
     return (
         <div className={styles.container}>
@@ -50,8 +67,6 @@ export default function Dashboard() {
                     <Link href="/dashboard" className={styles.navItem}>📊 Genel Bakış</Link>
                     <Link href="/dashboard/vehicles" className={styles.navItem}>🚗 Araç Listesi</Link>
                     <Link href="/dashboard/stations" className={styles.navItem}>🔌 İstasyon Durumu</Link>
-
-                    {/* YENİ EKLENEN AYARLAR LİNKİ */}
                     <Link href="/dashboard/settings" className={styles.navItem}>⚙️ Ayarlar</Link>
                 </nav>
             </aside>
