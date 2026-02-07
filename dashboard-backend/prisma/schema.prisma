@@ -1,15 +1,15 @@
-// Prisma 7 Standart Şeması
+// 1. Prisma İstemcisi Ayarları
 generator client {
-  provider   = "prisma-client-js"
-  engineType = "library"
+  provider = "prisma-client-js"
 }
 
-
+// 2. Veritabanı Bağlantısı (SQLite kullanıyoruz)
 datasource db {
   provider = "sqlite"
   url      = "file:./dev.db"
 }
-// Araç Modeli
+
+// 3. Araç Modeli
 model Vehicle {
   id        Int      @id @default(autoincrement())
   model     String
@@ -19,7 +19,7 @@ model Vehicle {
   updatedAt DateTime @updatedAt
 }
 
-// İstasyon Modeli
+// 4. İstasyon Modeli
 model Station {
   id           Int      @id @default(autoincrement())
   name         String
@@ -29,10 +29,12 @@ model Station {
   totalSockets Int      @default(2)
 }
 
-// Dashboard İstatistikleri
+// 5. Dashboard İstatistikleri Modeli
 model DashboardStats {
   id           Int      @id @default(1)
-  totalKwh     Float    @default(0.0)
-  dailyEarning Float    @default(0.0)
+  totalKwh     Float    @default(0)
+  activeCars   Int      @default(0)
   faultyUnits  Int      @default(0)
+  dailyEarning Float    @default(0)
+  lastUpdate   DateTime @default(now())
 }
