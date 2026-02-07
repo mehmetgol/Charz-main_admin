@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import styles from './dashboard.module.css';
 
-// 1. Veri yapısını tanımlıyoruz
 interface DashboardStats {
     totalKwh: number;
     activeCars: number;
@@ -13,8 +12,6 @@ interface DashboardStats {
 }
 
 export default function Dashboard() {
-    // 2. DEĞİŞİKLİK BURADA: State'e varsayılan (başlangıç) değerleri veriyoruz.
-    // Böylece 'stats' asla null olmayacak ve yükleme ekranında takılmayacak.
     const [stats, setStats] = useState<DashboardStats>({
         totalKwh: 0,
         activeCars: 0,
@@ -23,33 +20,39 @@ export default function Dashboard() {
         lastUpdate: new Date().toISOString()
     });
 
-    useEffect(() => {
-        // API adresini buraya yazıyoruz
-        const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+    const [formattedTime, setFormattedTime] = useState<string>("");
 
-        fetch(`${API_URL}/api/stats`)
+    useEffect(() => {
+        if (stats.lastUpdate) {
+            setFormattedTime(new Date(stats.lastUpdate).toLocaleTimeString());
+        }
+    }, [stats.lastUpdate]);
+
+    useEffect(() => {
+        // API yolunu '/api/stats' yaparak kendi iç API'mize yönlendirdik
+        const API_URL = '/api/stats';
+
+        fetch(API_URL)
             .then((res) => res.json())
             .then((data) => {
-                // Veri geldiyse state'i güncelle
                 setStats(data);
             })
             .catch((err) => {
-                console.error("Veri çekilemedi, varsayılanlar kullanılıyor:", err);
+                console.error("Veri çekilemedi:", err);
             });
     }, []);
 
-    // 3. DEĞİŞİKLİK BURADA: Artık "if (!stats) return..." satırını sildik!
-    // Sayfa anında açılacak, veriler gelince 0'lar güncellenecek.
-
     return (
         <div className={styles.container}>
-            {/* ... Yan Menü Kodların Aynı Kalacak ... */}
             <aside className={styles.sidebar}>
                 <h2>TOGG CHARZ</h2>
                 <nav className={styles.navMenu}>
                     <Link href="/dashboard" className={styles.navItem}>📊 Genel Bakış</Link>
                     <Link href="/dashboard/vehicles" className={styles.navItem}>🚗 Araç Listesi</Link>
                     <Link href="/dashboard/stations" className={styles.navItem}>🔌 İstasyon Durumu</Link>
+
+                    {/* YENİ EKLENEN AYARLAR LİNKİ */}
+                    <Link href="/dashboard/settings" className={styles.navItem}>⚙️ Ayarlar</Link>
                 </nav>
             </aside>
 
@@ -57,7 +60,7 @@ export default function Dashboard() {
                 <header className={styles.header}>
                     <h1>Yönetim Paneli</h1>
                     <div>
-                        <span>Son Güncelleme: <b>{new Date(stats.lastUpdate).toLocaleTimeString()}</b></span>
+                        <span>Son Güncelleme: <b>{formattedTime}</b></span>
                     </div>
                 </header>
 
@@ -83,7 +86,6 @@ export default function Dashboard() {
                     </div>
                 </div>
 
-                {/* Alt Kısım */}
                 <div className={styles.placeholderBox}>
                     Grafikler ve Detaylı Veriler Yükleniyor...
                 </div>
