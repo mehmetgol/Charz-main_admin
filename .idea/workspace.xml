@@ -1,0 +1,294 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="32c799ac-795c-40ab-8605-bc25c4f3175f" name="Changes" comment="end_commit" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="RESET_MODE" value="HARD" />
+    <option name="UPDATE_TYPE" value="REBASE" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;mehmetgol&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/mehmetgol/Charz-main_admin.git&quot;,
+    &quot;accountId&quot;: &quot;ccafd2d5-0266-4c4b-bdc8-884264bf3d93&quot;
+  }
+}</component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 6
+}</component>
+  <component name="ProjectId" id="38txnek8PAp6XfFglW4sy8t1FFY" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
+    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;javascript.preferred.runtime.type.id&quot;: &quot;node&quot;,
+    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/22051350173/Desktop/Charz-main (3)/Charz-main/src/app/api&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;npm.dev.executor&quot;: &quot;Run&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.keymap&quot;,
+    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;C:\\Users\\22051350173\\Desktop\\Charz-main (3)\\Charz-main\\node_modules\\typescript\\lib&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  }
+}</component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\22051350173\Desktop\Charz-main (3)\Charz-main\src\app\api" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\22051350173\Desktop\Charz-main (3)\Charz-main\src\app\api" />
+      <recent name="C:\Users\22051350173\Desktop\Charz-main (3)\dashboard-backend" />
+      <recent name="C:\Users\22051350173\Desktop\Charz-main (3)\Charz-main\src\app\dashboard\vehicles\api" />
+      <recent name="C:\Users\22051350173\Desktop\Charz-main (3)" />
+      <recent name="C:\Users\22051350173\Desktop\Charz-main (3)\Charz-main" />
+    </key>
+  </component>
+  <component name="RunManager">
+    <configuration name="dev" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
+      <package-json value="$PROJECT_DIR$/Charz-main/package.json" />
+      <command value="run" />
+      <scripts>
+        <script value="dev" />
+      </scripts>
+      <node-interpreter value="project" />
+      <envs />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="npm.dev" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-js-predefined-d6986cc7102b-c7e53b3be11b-JavaScript-WS-253.28294.332" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="32c799ac-795c-40ab-8605-bc25c4f3175f" name="Changes" comment="" />
+      <created>1769632837256</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1769632837256</updated>
+      <workItem from="1769632840108" duration="369000" />
+      <workItem from="1769676517336" duration="2759000" />
+      <workItem from="1769679761208" duration="2668000" />
+      <workItem from="1769891116384" duration="935000" />
+      <workItem from="1769892093979" duration="1241000" />
+      <workItem from="1769939295200" duration="6402000" />
+      <workItem from="1769952985495" duration="1010000" />
+      <workItem from="1770138697410" duration="4000" />
+      <workItem from="1770187624914" duration="3188000" />
+      <workItem from="1770191996943" duration="738000" />
+      <workItem from="1770383066333" duration="4805000" />
+      <workItem from="1770389235358" duration="166000" />
+      <workItem from="1770389452850" duration="338000" />
+      <workItem from="1770389826739" duration="69000" />
+      <workItem from="1770390263276" duration="2328000" />
+      <workItem from="1770443573062" duration="3284000" />
+      <workItem from="1770446923609" duration="1031000" />
+      <workItem from="1770448364677" duration="3155000" />
+      <workItem from="1770454964597" duration="1040000" />
+      <workItem from="1770456745437" duration="8846000" />
+      <workItem from="1770467200697" duration="1224000" />
+      <workItem from="1770473306452" duration="665000" />
+      <workItem from="1770475823052" duration="2384000" />
+      <workItem from="1770478829374" duration="1057000" />
+      <workItem from="1770479993879" duration="135000" />
+      <workItem from="1770480407528" duration="142000" />
+      <workItem from="1770480692678" duration="898000" />
+      <workItem from="1770482105079" duration="1373000" />
+      <workItem from="1770483530088" duration="766000" />
+      <workItem from="1770484343652" duration="726000" />
+      <workItem from="1770486580932" duration="140000" />
+      <workItem from="1770486756783" duration="365000" />
+      <workItem from="1770488576440" duration="142000" />
+      <workItem from="1770488746563" duration="145000" />
+      <workItem from="1770488919657" duration="120000" />
+      <workItem from="1770489069775" duration="60000" />
+      <workItem from="1770489162448" duration="2305000" />
+      <workItem from="1770491556221" duration="957000" />
+      <workItem from="1770492999473" duration="114000" />
+      <workItem from="1770493149768" duration="444000" />
+      <workItem from="1770494201946" duration="927000" />
+      <workItem from="1770530928768" duration="2108000" />
+    </task>
+    <task id="LOCAL-00001" summary="fixed_eror">
+      <option name="closed" value="true" />
+      <created>1769953605588</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1769953605588</updated>
+    </task>
+    <task id="LOCAL-00002" summary="fixed_eror_LOGİN">
+      <option name="closed" value="true" />
+      <created>1770190838671</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1770190838671</updated>
+    </task>
+    <task id="LOCAL-00003" summary="added_seating">
+      <option name="closed" value="true" />
+      <created>1770457272566</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1770457272566</updated>
+    </task>
+    <task id="LOCAL-00004" summary="fixed_car_stions">
+      <option name="closed" value="true" />
+      <created>1770460807731</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1770460807731</updated>
+    </task>
+    <task id="LOCAL-00005" summary="change_istasyon">
+      <option name="closed" value="true" />
+      <created>1770468419781</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1770468419781</updated>
+    </task>
+    <task id="LOCAL-00006" summary="solve_port_issue">
+      <option name="closed" value="true" />
+      <created>1770477420681</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1770477420681</updated>
+    </task>
+    <task id="LOCAL-00007" summary="added_setting2">
+      <option name="closed" value="true" />
+      <created>1770477866904</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1770477866904</updated>
+    </task>
+    <task id="LOCAL-00008" summary="added_setting3">
+      <option name="closed" value="true" />
+      <created>1770477958553</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1770477958553</updated>
+    </task>
+    <task id="LOCAL-00009" summary="added_setting9">
+      <option name="closed" value="true" />
+      <created>1770482845387</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1770482845387</updated>
+    </task>
+    <task id="LOCAL-00010" summary="plaeseson">
+      <option name="closed" value="true" />
+      <created>1770484712493</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1770484712493</updated>
+    </task>
+    <task id="LOCAL-00011" summary="end_commit">
+      <option name="closed" value="true" />
+      <created>1770533031076</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1770533031092</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+    <option name="exactExcludedFiles">
+      <list>
+        <option value="$PROJECT_DIR$/dashboard-backend/server.js.map" />
+        <option value="$PROJECT_DIR$/dashboard-backend/server.d.ts" />
+        <option value="$PROJECT_DIR$/dashboard-backend/server.d.ts.map" />
+        <option value="$PROJECT_DIR$/dashboard-backend/server.js" />
+        <option value="$PROJECT_DIR$/Charz-main/src/app/api/dashboard-backend/server.js" />
+        <option value="$PROJECT_DIR$/Charz-main/src/app/api/dashboard-backend/server.d.ts" />
+        <option value="$PROJECT_DIR$/Charz-main/src/app/api/dashboard-backend/server.js.map" />
+        <option value="$PROJECT_DIR$/Charz-main/src/app/api/dashboard-backend/server.d.ts.map" />
+      </list>
+    </option>
+  </component>
+  <component name="UnknownFeatures">
+    <option featureType="com.intellij.fileTypeFactory" implementationName=".env" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="fixed_eror" />
+    <MESSAGE value="fixed_eror_LOGİN" />
+    <MESSAGE value="added_seating" />
+    <MESSAGE value="fixed_car_stions" />
+    <MESSAGE value="change_istasyon" />
+    <MESSAGE value="solve_port_issue" />
+    <MESSAGE value="added_setting2" />
+    <MESSAGE value="added_setting3" />
+    <MESSAGE value="added_setting6" />
+    <MESSAGE value="added_setting9" />
+    <MESSAGE value="plaeseson" />
+    <MESSAGE value="end_commit" />
+    <option name="LAST_COMMIT_MESSAGE" value="end_commit" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/Charz-main/src/app/admin/layout.tsx</url>
+          <line>11</line>
+          <option name="timeStamp" value="2" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
+</project>
