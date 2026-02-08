@@ -16,14 +16,20 @@ export default function VehiclesPage() {
     const [newVehicle, setNewVehicle] = useState({ model: '', plate: '', status: 'Beklemede' });
     const [loading, setLoading] = useState(true);
 
-    const API_URL = 'http://localhost:5000/api/vehicles';
+    // --- URL YAPILANDIRMASI ---
+    const BASE_URL = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, '');
+    const API_URL = `${BASE_URL}/api/vehicles`;
 
     // 1. VERİLERİ ÇEK
     const fetchVehicles = async () => {
+        if (!BASE_URL) return;
+        setLoading(true);
         try {
             const res = await fetch(API_URL);
-            const data = await res.json();
-            setVehicles(data);
+            if (res.ok) {
+                const data = await res.json();
+                setVehicles(data);
+            }
         } catch (err) {
             console.error("Veri çekme hatası:", err);
         } finally {
@@ -33,7 +39,7 @@ export default function VehiclesPage() {
 
     useEffect(() => {
         fetchVehicles();
-    }, []);
+    }, [BASE_URL]);
 
     // 2. YENİ ARAÇ EKLE
     const addVehicle = async (e: React.FormEvent) => {
@@ -41,7 +47,7 @@ export default function VehiclesPage() {
         if (!newVehicle.model || !newVehicle.plate) return alert("Lütfen alanları doldurun!");
 
         const vehicleData = {
-            id: 0, // Yeni kayıt için 0 gönderiyoruz (Backend upsert bunu yeni kayıt olarak görecek)
+            id: 0, // Yeni kayıt için 0
             model: newVehicle.model,
             plate: newVehicle.plate,
             status: newVehicle.status,
@@ -55,18 +61,17 @@ export default function VehiclesPage() {
                 body: JSON.stringify(vehicleData),
             });
 
-            const result = await response.json();
-
             if (response.ok) {
-                alert("Araç başarıyla kaydedildi!");
+                alert("Araç başarıyla kaydedildi! ✅");
                 setNewVehicle({ model: '', plate: '', status: 'Beklemede' });
-                fetchVehicles(); // Listeyi güncelle
+                fetchVehicles();
             } else {
+                const result = await response.json();
                 alert("Hata: " + (result.error || "Bilinmeyen bir sorun oluştu"));
             }
         } catch (err) {
             console.error("Bağlantı hatası:", err);
-            alert("Backend sunucusuna ulaşılamadı. Sunucunun 5000 portunda açık olduğundan emin olun!");
+            alert("Sunucuya ulaşılamadı. Lütfen Render bağlantısını kontrol edin.");
         }
     };
 
@@ -78,15 +83,18 @@ export default function VehiclesPage() {
             const response = await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
             if (response.ok) {
                 fetchVehicles();
+            } else {
+                alert("Silme işlemi sunucu tarafında başarısız oldu.");
             }
         } catch (err) {
             console.error("Silme hatası:", err);
+            alert("Bağlantı hatası: Araç silinemedi.");
         }
     };
 
     return (
         <div className={styles.container}>
-            <Link href="/dashboard" style={{color: '#22c55e', marginBottom: '20px', display: 'block'}}>
+            <Link href="/dashboard" style={{color: '#22c55e', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '5px', textDecoration: 'none', fontWeight: 'bold'}}>
                 ← Dashboard'a Dön
             </Link>
 
@@ -97,17 +105,19 @@ export default function VehiclesPage() {
                 <form onSubmit={addVehicle} className={styles.formInline}>
                     <input
                         type="text"
-                        placeholder="Model"
+                        placeholder="Model (Örn: Togg T10X)"
                         value={newVehicle.model}
                         onChange={(e) => setNewVehicle({...newVehicle, model: e.target.value})}
                         className={styles.input}
+                        required
                     />
                     <input
                         type="text"
-                        placeholder="Plaka"
+                        placeholder="Plaka (Örn: 34 TOGG 1923)"
                         value={newVehicle.plate}
                         onChange={(e) => setNewVehicle({...newVehicle, plate: e.target.value})}
                         className={styles.input}
+                        required
                     />
                     <select
                         value={newVehicle.status}
@@ -116,13 +126,18 @@ export default function VehiclesPage() {
                     >
                         <option value="Beklemede">Beklemede</option>
                         <option value="Şarj Oluyor">Şarj Oluyor</option>
+                        <option value="Tamamlandı">Tamamlandı</option>
                     </select>
                     <button type="submit" className={styles.addButton}>Ekle ve Kaydet</button>
                 </form>
             </div>
 
             <div className={styles.tableWrapper}>
-                {loading ? <p>Yükleniyor...</p> : (
+                {loading ? (
+                    <div style={{textAlign: 'center', padding: '40px'}}>
+                        <p>⏳ Veriler yükleniyor (Render sunucusu uyanıyor olabilir)...</p>
+                    </div>
+                ) : (
                     <table className={styles.vehicleTable}>
                         <thead>
                         <tr>
@@ -134,17 +149,34 @@ export default function VehiclesPage() {
                         </tr>
                         </thead>
                         <tbody>
-                        {vehicles.map((v) => (
-                            <tr key={v.id}>
-                                <td><b>{v.model}</b></td>
-                                <td>{v.plate}</td>
-                                <td>%{v.battery}</td>
-                                <td>{v.status}</td>
-                                <td>
-                                    <button onClick={() => deleteVehicle(v.id)} className={styles.deleteButton}>Sil</button>
-                                </td>
+                        {vehicles.length === 0 ? (
+                            <tr>
+                                <td colSpan={5} style={{textAlign: 'center', padding: '20px'}}>Kayıtlı araç bulunamadı.</td>
                             </tr>
-                        ))}
+                        ) : (
+                            vehicles.map((v) => (
+                                <tr key={v.id}>
+                                    <td><b>{v.model}</b></td>
+                                    <td>{v.plate}</td>
+                                    <td>
+                                        <div style={{display: 'flex', alignItems: 'center', gap: '5px'}}>
+                                            <div style={{width: '40px', height: '10px', background: '#eee', borderRadius: '5px', overflow: 'hidden'}}>
+                                                <div style={{width: `${v.battery}%`, height: '100%', background: v.battery > 20 ? '#22c55e' : '#ef4444'}}></div>
+                                            </div>
+                                            %{v.battery}
+                                        </div>
+                                    </td>
+                                    <td>
+                                            <span className={styles[`status${v.status.replace(' ', '')}`] || styles.statusDefault}>
+                                                {v.status}
+                                            </span>
+                                    </td>
+                                    <td>
+                                        <button onClick={() => deleteVehicle(v.id)} className={styles.deleteButton}>Sil</button>
+                                    </td>
+                                </tr>
+                            ))
+                        )}
                         </tbody>
                     </table>
                 )}

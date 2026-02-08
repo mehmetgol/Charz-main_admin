@@ -1,0 +1,40 @@
+// 1. Prisma İstemcisi Ayarları
+generator client {
+  provider = "prisma-client-js"
+}
+
+// 2. Veritabanı Bağlantısı (SQLite kullanıyoruz)
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+// 3. Araç Modeli
+model Vehicle {
+  id        Int      @id @default(autoincrement())
+  model     String
+  plate     String   @unique
+  battery   Int      @default(0)
+  status    String   @default("Beklemede")
+  updatedAt DateTime @updatedAt
+}
+
+// 4. İstasyon Modeli
+model Station {
+  id           Int      @id @default(autoincrement())
+  name         String
+  location     String
+  status       String   @default("Aktif")
+  usedSockets  Int      @default(0)
+  totalSockets Int      @default(2)
+}
+
+// 5. Dashboard İstatistikleri Modeli
+model DashboardStats {
+  id           Int      @id @default(1)
+  totalKwh     Float    @default(0)
+  activeCars   Int      @default(0)
+  faultyUnits  Int      @default(0)
+  dailyEarning Float    @default(0)
+  lastUpdate   DateTime @default(now())
+}

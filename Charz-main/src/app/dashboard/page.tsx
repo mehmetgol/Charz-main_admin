@@ -21,32 +21,49 @@ export default function Dashboard() {
     });
 
     const [formattedTime, setFormattedTime] = useState<string>("");
-    const API_URL = 'http://127.0.0.1:5000/api/stats';
 
-    // Verileri çekme fonksiyonu
+    // --- URL YAPILANDIRMASI ---
+    // URL'in sonundaki / işaretini temizleyerek güvenli hale getiriyoruz
+    const BASE_URL = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, '');
+    const API_URL = `${BASE_URL}/api/stats`;
+
+    // VERİLERİ ÇEKME FONKSİYONU
     const fetchStats = async () => {
+        if (!BASE_URL) {
+            console.warn("⚠️ API URL henüz tanımlanmamış. .env dosyasını kontrol edin.");
+            return;
+        }
+
         try {
             const res = await fetch(API_URL);
             if (res.ok) {
                 const data = await res.json();
-                if (data) setStats(data);
+                if (data) {
+                    setStats(data);
+                    localStorage.setItem('dashboard_data', JSON.stringify(data));
+                }
             }
         } catch (err) {
             console.error("Veri çekilemedi:", err);
+            // İnternet veya sunucu hatasında yerel veriyi kullan
             const savedStats = localStorage.getItem('dashboard_data');
             if (savedStats) setStats(JSON.parse(savedStats));
         }
     };
 
+    // İlk açılışta verileri çek
     useEffect(() => {
         fetchStats();
-    }, []);
+        // İsteğe bağlı: Her 30 saniyede bir güncelle
+        const interval = setInterval(fetchStats, 30000);
+        return () => clearInterval(interval);
+    }, [BASE_URL]);
 
-    // VERİTABANINI GÜNCELLEME FONKSİYONU
+    // VERİ GÜNCELLEME (ARTIRMA/AZALTMA) FONKSİYONU
     const updateStat = async (field: keyof DashboardStats, amount: number) => {
         const newStats = {
             ...stats,
-            [field]: Math.max(0, (stats[field] as number) + amount), // Negatif değer olmasını engeller
+            [field]: Math.max(0, (Number(stats[field])) + amount),
             lastUpdate: new Date().toISOString()
         };
 
@@ -60,13 +77,16 @@ export default function Dashboard() {
             if (res.ok) {
                 setStats(newStats);
                 localStorage.setItem('dashboard_data', JSON.stringify(newStats));
+            } else {
+                throw new Error("Sunucu yanıt vermedi");
             }
         } catch (err) {
             console.error("Güncelleme hatası:", err);
-            alert("Sunucuya ulaşılamadı, değişiklik kaydedilemedi.");
+            alert("Sunucuya ulaşılamadı. Değişiklik kaydedilemedi.");
         }
     };
 
+    // Saat formatlama
     useEffect(() => {
         if (stats?.lastUpdate) {
             setFormattedTime(new Date(stats.lastUpdate).toLocaleTimeString());
@@ -94,7 +114,6 @@ export default function Dashboard() {
                 </header>
 
                 <div className={styles.statsGrid}>
-                    {/* TOPLAM ENERJİ */}
                     <div className={styles.card}>
                         <h3>Toplam Enerji</h3>
                         <p>{stats.totalKwh?.toLocaleString() ?? 0} <small>kWh</small></p>
@@ -104,7 +123,6 @@ export default function Dashboard() {
                         </div>
                     </div>
 
-                    {/* AKTİF ARAÇLAR */}
                     <div className={styles.card}>
                         <h3>Aktif Araçlar</h3>
                         <p>{stats.activeCars ?? 0}</p>
@@ -114,7 +132,6 @@ export default function Dashboard() {
                         </div>
                     </div>
 
-                    {/* ARIZALI ÜNİTELER */}
                     <div className={styles.card} style={{ borderBottomColor: stats.faultyUnits > 0 ? '#ef4444' : '#22c55e' }}>
                         <h3>Arızalı Üniteler</h3>
                         <p style={{ color: stats.faultyUnits > 0 ? '#ef4444' : '#22c55e' }}>
@@ -126,7 +143,6 @@ export default function Dashboard() {
                         </div>
                     </div>
 
-                    {/* GÜNLÜK KAZANÇ */}
                     <div className={styles.card}>
                         <h3>Günlük Kazanç</h3>
                         <p>₺{stats.dailyEarning?.toLocaleString() ?? 0}</p>
@@ -138,7 +154,13 @@ export default function Dashboard() {
                 </div>
 
                 <div className={styles.placeholderBox}>
-                    {stats.totalKwh === 0 ? "⚠️ Sunucu kapalı (Port 5000)." : "✅ Veritabanı Aktif."}
+                    {!BASE_URL ? (
+                        <span style={{ color: '#f59e0b' }}>⚠️ API URL Ayarlanmadı (.env.local kontrol edin)</span>
+                    ) : stats.totalKwh === 0 ? (
+                        <span className={styles.loadingPulse}>⏳ Veri bekleniyor (Render uyanıyor olabilir)...</span>
+                    ) : (
+                        <span style={{ color: '#22c55e' }}>✅ Veritabanı Bağlantısı Aktif</span>
+                    )}
                 </div>
             </main>
         </div>
